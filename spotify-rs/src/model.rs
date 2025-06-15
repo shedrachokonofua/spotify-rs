@@ -1,13 +1,13 @@
 use std::time::Duration;
 
 use crate::{
+    Error, Token,
     auth::AuthFlow,
     client::{self, Client},
     endpoint::Endpoint,
     error::Result,
-    Error, Token,
 };
-use serde::{de::DeserializeOwned, Deserialize, Deserializer};
+use serde::{Deserialize, Deserializer, de::DeserializeOwned};
 
 pub mod album;
 pub mod artist;
@@ -475,11 +475,14 @@ pub enum DatePrecision {
 /// An item that can be played.
 #[derive(Clone, Debug, Deserialize, PartialEq)]
 #[serde(untagged)]
+#[non_exhaustive]
 pub enum PlayableItem {
     /// A Spotify track (song).
     Track(track::Track),
     /// An episode of a show.
     Episode(show::Episode),
+    /// Any other type of PlayableItem, as more may be added in the future.
+    Unknown(serde_json::Value),
 }
 
 // A function to convert a "null" JSON value to the default of given type,
